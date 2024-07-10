@@ -1,7 +1,10 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, useContext } from "react";
 import "../styles/Quiz.css";
 import { data } from "../assets/data";
 import { toast, Toaster } from "react-hot-toast";
+import {useAuth} from "../utils/authContext";
+import { logout } from "../utils/logout";
+import { useNavigate } from "react-router-dom";
 // import postAchievement from '../services/achievementService';
 
 export default function Quiz() {
@@ -11,6 +14,8 @@ export default function Quiz() {
   let [score, setScore] = useState(0);
   let [result, setResult] = useState(false); // Prevent container from disappearing after last question is answered
   let [achievements, setAchievements] = useState([]);
+  const { isLoggedIn, user } = useAuth();
+  const Navigate = useNavigate()
 
   // After choosing displaying the correct answer
   let Option1 = useRef(null);
@@ -82,6 +87,15 @@ export default function Quiz() {
     }
   };
 
+  const handleLogout = async() => {
+    try {
+      await logout()
+      Navigate('/')
+    } catch (error) {
+      console.error(`Error in logging out`, error)
+    }
+  }
+
   // reset all after the user completes
   const reset = () => {
     setIndex(0);
@@ -94,6 +108,14 @@ export default function Quiz() {
   return (
     <div className="container">
       <Toaster />
+      <div>
+        {isLoggedIn ? (
+          <h1>Welcome, {user.userName}</h1>
+        ) : (
+          <h1>Please log in</h1>
+        )}
+        <button onClick={handleLogout}>Logout</button>
+      </div>
       <h1>Quiz Game</h1>
       <hr />
       {result ? (
