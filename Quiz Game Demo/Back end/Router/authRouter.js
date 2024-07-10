@@ -47,7 +47,7 @@ router.post("/login", async (req, res) => {
       userEmail: user.email,
       userName: user.name
     },
-    "your_secret_key",
+    process.env.JWT_SECRET,
     { expiresIn: "1h" }
   ); 
 
@@ -56,7 +56,7 @@ router.post("/login", async (req, res) => {
     httpOnly: true, // Cookie is not accessible via client-side JavaScript
     secure: process.env.NODE_ENV === "production", // Cookie only sent over HTTPS in production
     maxAge: 3600000,
-    // sameSite: "strict",  Restrict cookie to same site requests
+    sameSite: "strict",  // Restrict cookie to same site requests
   });
 
   res.json({ success: true, message: "Login successful" });
@@ -75,7 +75,11 @@ router.get('/check-auth', verifyToken, async (req, res) => {
 
 // Logout endpoint
 router.post("/logout", (req, res) => {
-  res.clearCookie("jwt");
+  res.clearCookie("jwt",{
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict'
+  });
   res.json({ success: true, message: "Logged out successfully" })
 });
 
