@@ -10,7 +10,8 @@ app.use(express.json());
 
 // Allow request from a server
 app.use(cors({
-    origin: 'http://localhost:5173'
+    origin: 'http://localhost:5174',
+    credentials: true
 }));
 
 // Cookie Parser middleware
@@ -23,5 +24,5 @@ connect();
 app.use(authRouter);
 
 // Start the server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 3001;
 app.listen(port, () => console.log(`server running on port: ${port}`));
