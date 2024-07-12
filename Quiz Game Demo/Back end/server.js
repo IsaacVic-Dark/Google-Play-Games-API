@@ -12,6 +12,7 @@ app.use(express.json());
 // Allow request from a server
 app.use(cors({
     origin: 'http://localhost:5174',
+    
     credentials: true
 }));
 

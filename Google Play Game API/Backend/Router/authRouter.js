@@ -4,6 +4,10 @@ const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require('../Model/user')
 const verifyToken = require('../Middleware/verifyToken')
+const checkRole = require('../Middleware/checkRole')
+
+require('dotenv').config();
+
 
 // Get All Users
 router.get("/", async(req, res) => {
@@ -17,9 +21,9 @@ router.get("/", async(req, res) => {
 
 // Register request
 router.post("/register", async (req, res) => {
-  const { name, email, password } = req.body;
+  const { name, email, password, role } = req.body;
   const hashedPassword = await bcrypt.hash(password, 10);
-  User.create({ name, email, password: hashedPassword })
+  User.create({ name, email, password: hashedPassword, role})
     .then((users) => {
       res.json(users);
     })
@@ -45,7 +49,8 @@ router.post("/login", async (req, res) => {
     {
       userId: user._id,
       userEmail: user.email,
-      userName: user.name
+      userName: user.name,
+      userRole: user.role
     },
     process.env.JWT_SECRET,
     { expiresIn: "1h" }
@@ -53,12 +58,12 @@ router.post("/login", async (req, res) => {
 
   // Send the JWT as a cookie
   res.cookie("jwt", token, {
+    signed: true,
     httpOnly: true, // Cookie is not accessible via client-side JavaScript
-    secure: process.env.NODE_ENV === "production", // Cookie only sent over HTTPS in production
+    // secure: process.env.NODE_ENV === "production", // Cookie only sent over HTTPS in production
     maxAge: 3600000,
-    sameSite: "strict",  // Restrict cookie to same site requests
+    // sameSite: "strict",  // Restrict cookie to same site requests
   });
-
   res.json({ success: true, message: "Login successful" });
 });
 
@@ -82,5 +87,21 @@ router.post("/logout", (req, res) => {
   });
   res.json({ success: true, message: "Logged out successfully" })
 });
+
+router.get('/admin', verifyToken, checkRole(['admin', 'super_admin']), async (req, res) => {
+  try {
+    res.send('Welcome admin')
+  } catch (error) {
+    console.error('Error in getting admin', error)
+  }
+})
+
+router.get('/super_admin', verifyToken, checkRole(['super_admin']), async (req, res) => {
+  try {
+    res.send('Welcome Super Admins')
+  } catch (error) {
+    console.error('Error fetching super admin', error)
+  }
+})
 
 module.exports = router;
