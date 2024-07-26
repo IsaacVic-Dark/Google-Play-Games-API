@@ -1,7 +1,11 @@
 import React from 'react'
+import LogNav from '../Layout/LogNav'
 
 export default function Library() {
   return (
-    <h1>libraryPage</h1>
+    <>
+      <LogNav/>
+      <h1>libraryPage</h1>
+    </>
   )
 }

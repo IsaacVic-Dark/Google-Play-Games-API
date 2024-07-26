@@ -5,9 +5,9 @@ const Achievement = require("../Model/achievement");
 
 // Create a new achievement
 router.post("/achievements", async (req, res) => {
-  const { achievement, points, userId } = req.body;
+  const { achievement, points, userId, userName } = req.body;
   try {
-    const achieve = new Achievement({ achievement, points, userId });
+    const achieve = new Achievement({ achievement, points, userId, userName });
     await achieve.save();
     res.status(201).json(achieve);
   } catch (err) {

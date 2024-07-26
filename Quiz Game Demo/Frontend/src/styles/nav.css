@@ -1,0 +1,26 @@
+*{
+    padding: 0;
+    margin: 0;
+}
+nav ul{
+    list-style-type: none;
+}
+nav ul li a{
+    color: black;
+    text-decoration: none;
+    font-family: sans-serif;
+    font-weight: bold;
+}
+nav ul{
+    display: flex;
+    justify-content: end;
+    gap: 1rem;
+}
+nav{
+    margin: 1rem;
+}
+
+nav ul li a:hover{
+    color: #2fc078;
+    transform: scale(1.1);
+}

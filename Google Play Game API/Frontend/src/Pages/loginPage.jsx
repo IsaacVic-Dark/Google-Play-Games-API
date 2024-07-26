@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { login } from '../utils/login.js';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import '../styles/login.css';
 
 function LoginForm() {
@@ -55,6 +55,9 @@ function LoginForm() {
         <button onClick={handleLogin} disabled={isLoginDisabled}>
           {loading ? 'Logging in...' : 'Login'}
         </button>
+      </div>
+      <div className='signUp'>
+        <p>Don't have an account ? <Link to="/register">SignUp</Link> </p>
       </div>
     </div>
   );

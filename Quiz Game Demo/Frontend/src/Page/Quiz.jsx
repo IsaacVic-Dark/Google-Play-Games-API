@@ -1,11 +1,15 @@
 import React, { useState, useRef, useEffect } from "react";
 import "../styles/Quiz.css";
 import { data } from "../assets/data";
-import { toast, Toaster } from "react-hot-toast";
+import { Toaster } from "react-hot-toast";
 import { useAuth } from "../utils/authContext";
-import { logout } from "../utils/logout";
-import { useNavigate } from "react-router-dom";
-import postAchievement from "../utils/postAchievement";
+// import { logout } from "../utils/logout";
+// import { useNavigate } from "react-router-dom";
+import LogNav from "../Layout/LogNav";
+import checkAchievements from "../utils/reusableFunc/checkAchievement";
+import io from "socket.io-client";
+
+const socket = io('http://localhost:3001');
 
 export default function Quiz() {
   let [index, setIndex] = useState(0);
@@ -14,8 +18,9 @@ export default function Quiz() {
   let [points, setPoints] = useState(0);
   let [result, setResult] = useState(false);
   let [achievements, setAchievements] = useState([]);
+  let [userScores, setUserScores] = useState({});
   const { isLoggedIn, user } = useAuth();
-  const navigate = useNavigate();
+  
 
   let Option1 = useRef(null);
   let Option2 = useRef(null);
@@ -28,62 +33,37 @@ export default function Quiz() {
     console.log("Achievements: ", achievements);
   }, [achievements]);
 
-  const checkAchievements = (newPoints) => {
-    const newAchievements = [...achievements];
-    let hasNewAchievements = false;
+  useEffect(() => {
+    socket.on('scoreUpdate', (scores) => {
+      console.log('Score update received: ', scores);
+      setUserScores(scores);
+    });
 
-    if (newPoints === 1 && !newAchievements.includes("Good")) {
-      newAchievements.push("Good");
-      toast.success("Good Achievement Unlocked!");
-      hasNewAchievements = true;
-    }
-    if (newPoints === 2 && !newAchievements.includes("Better")) {
-      newAchievements.push("Better");
-      toast.success("Better Achievement Unlocked!");
-      hasNewAchievements = true;
-    }
-    if (newPoints === 3 && !newAchievements.includes("Brilliant")) {
-      newAchievements.push("Brilliant");
-      toast.success("Brilliant Achievement Unlocked!");
-      hasNewAchievements = true;
-    }
-    if (newPoints === 4 && !newAchievements.includes("Expert")) {
-      newAchievements.push("Expert");
-      toast.success("Expert Achievement Unlocked!");
-      hasNewAchievements = true;
-    }
-    if (newPoints === 5 && !newAchievements.includes("Experienced")) {
-      newAchievements.push("Experienced");
-      toast.success("Experienced Achievement Unlocked!");
-      hasNewAchievements = true;
-    }
+    return () => {
+      socket.off('scoreUpdate');
+    };
+  }, []);
 
-    if (hasNewAchievements) {
-      setAchievements(newAchievements);
-      saveAchievements(newAchievements, newPoints); 
+  useEffect(() => {
+    if (user && points !== undefined) {
+      socket.emit('scoreUpdate', { userName: user.userName, score: points });
     }
-  };
+  }, [points, user]);
 
-  const saveAchievements = async (achievements, points) => {
-    for (const achievement of achievements) {
-      await postAchievement(achievement, points);
-    }
-  };
-
-  const checkAnswer = (element, ans) => {
+  const checkAnswer = async (element, ans) => {
     if (lock === false) {
       if (question.ans === ans) {
         element.target.classList.add("correct");
-        setPoints((prev) => {
-          const newPoints = prev + 1;
-          checkAchievements(newPoints);
-          return newPoints;
-        });
+        const newPoints = points + 1;
+        setPoints(newPoints);
+        await checkAchievements(newPoints, achievements, setAchievements, user);
+        socket.emit('live', `User ${user.userName} answered question ${index + 1} correctly!`);
         setLock(true);
       } else {
         element.target.classList.add("wrong");
         setLock(true);
         optionArray[question.ans - 1].current.classList.add("correct");
+        socket.emit('live', `User ${user.userName} answered question ${index + 1} incorrectly.`);
       }
     }
   };
@@ -92,6 +72,8 @@ export default function Quiz() {
     if (lock === true) {
       if (index === data.length - 1) {
         setResult(true);
+        // const userName = user.userName;
+        // PostLeaderBoard(userName, points);
         return;
       }
       setIndex(++index);
@@ -104,14 +86,6 @@ export default function Quiz() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await logout();
-      navigate("/");
-    } catch (error) {
-      console.error("Error in logging out", error);
-    }
-  };
 
   const reset = () => {
     setIndex(0);
@@ -119,20 +93,16 @@ export default function Quiz() {
     setPoints(0);
     setLock(false);
     setResult(false);
+    socket.emit('scoreUpdate', { userName: user.userName, score: 0 });
   };
 
   return (
     <div className="wrapper">
-        <Toaster />
-        <div className="Nav">
-          {isLoggedIn ? (
-            <h1>Welcome, {user.userName}</h1>
-          ) : (
-            <h1>Please log in</h1>
-          )}
-          <button onClick={handleLogout}>Logout</button>
-        </div>
+      <Toaster />
       <div className="container">
+        <LogNav/>
+        {isLoggedIn ? (<h1>Hi, {user.userName}</h1>) : (<h1>User not found</h1>)}
+        <h2>Score: {points}</h2>
         <h1>Quiz Game</h1>
         <hr />
         {result ? (
@@ -192,6 +162,14 @@ export default function Quiz() {
         ) : (
           <></>
         )}
+        <h2>Other Users' Scores</h2>
+        <ul>
+          {Object.entries(userScores).map(([userName, score]) => (
+            <li key={userName}>
+              {userName}: {score}
+            </li>
+          ))}
+        </ul>
       </div>
     </div>
   );

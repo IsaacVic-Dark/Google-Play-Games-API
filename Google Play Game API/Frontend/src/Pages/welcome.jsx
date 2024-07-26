@@ -1,6 +1,7 @@
 import React,{useState} from 'react'
 import { useNavigate } from 'react-router-dom';
 import {useAuth} from "../utils/authContext";
+import LogNav from '../Layout/LogNav';
 
 
 export default function Welcome() {
@@ -8,14 +9,8 @@ export default function Welcome() {
 
   return (
     <>
-      <div>
-        {isLoggedIn ? (
-          <h1>Welcome, {user.userName}</h1>
-        ) : (
-          <h1>Please log in</h1>
-        )}
-      </div>
-      <h1>Welcome Page</h1>
+      <LogNav/>
+      
     </>
   )
 }

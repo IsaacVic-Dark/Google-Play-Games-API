@@ -8,7 +8,8 @@ const achievementSchema = new mongoose.Schema({
   userId: {
     type: Schema.Types.ObjectId,
     ref: "User" 
-  }
+  },
+  userName: String,
 });
 
 // Create an achievement model

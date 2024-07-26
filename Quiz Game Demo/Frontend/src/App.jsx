@@ -3,7 +3,8 @@ import Home from "./Page/home";
 import Quiz from "./Page/Quiz";
 import Nav from './Layout/Nav';
 import Logout from './Layout/LogNav'
-import RecordPage from "./Page/RecordPage";
+import LeaderBoard from "./Page/leaderBoard";
+import Profile from "./Page/profile";
 import RegisterForm from './Page/registerPage'
 import { Routes, Route, useLocation } from "react-router-dom";
 
@@ -19,6 +20,8 @@ function App() {
         <Route path="/register" element={<RegisterForm />} />
         <Route path="/quiz" element={<Quiz />} />
         <Route path="/logout" element={<Logout />} />
+        <Route path="/leaderBoard" element={<LeaderBoard />}></Route>
+        <Route path="/profile" element={<Profile />}></Route>
       </Routes>
     </>
   );

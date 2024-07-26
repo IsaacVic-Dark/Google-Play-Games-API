@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken')
 const verifyToken = (req, res, next) => {
   const token = req.signedCookies.jwt;
-  console.log(token)
   // Check if token exists
   if (!token) {
     return res
