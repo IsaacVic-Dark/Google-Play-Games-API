@@ -6,7 +6,7 @@ export const register = async ({ name, email, password }) => {
       name,
       email,
       password,
-    });
+    }, {withCredentials: true});
     return response.data;
   } catch (error) {
     console.error('Error registering user', error);

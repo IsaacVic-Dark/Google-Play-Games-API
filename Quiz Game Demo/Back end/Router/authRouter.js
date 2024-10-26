@@ -53,10 +53,11 @@ router.post("/login", async (req, res) => {
 
   // Send the JWT as a cookie
   res.cookie("jwt", token, {
+    signed: true,
     httpOnly: true, // Cookie is not accessible via client-side JavaScript
-    secure: process.env.NODE_ENV === "production", // Cookie only sent over HTTPS in production
+    // secure: process.env.NODE_ENV === "production", // Cookie only sent over HTTPS in production
     maxAge: 3600000,
-    sameSite: "strict",  // Restrict cookie to same site requests
+    // sameSite: "strict",  // Restrict cookie to same site requests
   });
 
   res.json({ success: true, message: "Login successful" });

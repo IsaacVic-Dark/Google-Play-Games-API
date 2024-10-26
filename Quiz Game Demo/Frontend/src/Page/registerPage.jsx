@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { register } from '../utils/register.js';
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, Link } from 'react-router-dom'
 import '../styles/login.css';
 
 function RegisterForm() {
@@ -65,6 +65,9 @@ function RegisterForm() {
         <button onClick={handleLogin} disabled={isRegisterDisabled}>
           {loading ? 'Register in process...' : 'Register'}
         </button>
+      </div>
+      <div className='login'>
+        <p>Do you have an account ? <Link to='/login'>Login</Link></p>
       </div>
     </div>
   );

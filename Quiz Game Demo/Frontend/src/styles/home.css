@@ -1,0 +1,20 @@
+body {
+    margin: 0;
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+  }
+  
+  .title {
+    font-size: 70px;
+    margin: 20px 0;
+  }
+  
+  .gif {
+    position: absolute; 
+    max-width: 60px;
+    height: auto;
+  }
+  
